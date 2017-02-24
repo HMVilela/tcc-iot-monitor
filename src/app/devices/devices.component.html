@@ -1,0 +1,42 @@
+<div class="col-md-4">
+    <div class="add-device-form">
+        <h1>Dispositivos: </h1>
+        <div class="form-group">
+            <!--<input class="form-control input-lg" placeholder="Add device" autofocus #deviceIp>
+            <br>
+            <button (click)="addDevice($event, deviceIp)" class="btn btn-primary btn-block">Create</button>-->
+            <div class="input-group">
+                <input class="form-control input-lg" placeholder="Adicionar dispositivo - (IPv6)" autofocus #deviceIp>
+                <span class="input-group-btn">
+                    <button class="btn btn-primary btn-block input-lg" (click)="addDevice($event, deviceIp)" type="submit">Adicionar</button>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="device-list">
+        <div *ngFor="let device of devices">
+            <div class="col-md-1">
+                <input type="checkbox" [checked]="device.isCompleted" (click)="updateStatus(device)">
+            </div>
+            <div class="col-md-7">
+                <span [class.hidden]="device.isEditMode">{{device.ip}}</span>
+                <input type="text"  [class.hidden]="!device.isEditMode" [value]="device.ip" (keypress)="updateDeviceIp($event, device)">
+                <input type="button" [class.hidden]="!device.isEditMode" value="Cancelar" (click)="setEditState(device, false)" class="btn btn-warning">
+
+            </div>
+            <div class="col-md-4 btns">
+                <input (click)="deleteDevice(device)" type="button" class="btn btn-danger pull-right" value="Apagar">
+                <input [class.disabled]="device.isCompleted" (click)="setEditState(device, true)" type="button" class="btn btn-default pull-right" value="Editar">
+            </div>
+        </div>
+    </div>
+    <!--<div class="device-list">
+        <div *ngFor="let device of devices">
+            <picture>
+                <source srcset="mdn-logo-wide.png" media="(min-width: 20px)">
+                <img src="../assets/device-icon.png" alt="MDN">
+            </picture>
+        </div>
+    </div>-->
+</div>
+
