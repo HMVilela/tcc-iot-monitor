@@ -1,42 +1,51 @@
-<div class="col-md-4">
-    <div class="add-device-form">
-        <h1>Dispositivos: </h1>
-        <div class="form-group">
-            <!--<input class="form-control input-lg" placeholder="Add device" autofocus #deviceIp>
-            <br>
-            <button (click)="addDevice($event, deviceIp)" class="btn btn-primary btn-block">Create</button>-->
-            <div class="input-group">
-                <input class="form-control input-lg" placeholder="Adicionar dispositivo - (IPv6)" autofocus #deviceIp>
-                <span class="input-group-btn">
-                    <button class="btn btn-primary btn-block input-lg" (click)="addDevice($event, deviceIp)" type="submit">Adicionar</button>
-                </span>
+<div class="container" style="width: 100% !important;">
+    <div class="col-md-4" style="background: #2F3646; margin-top: 50px; height: 1070px;">
+        <div class="add-device-form">
+            <h3 style="color: #F7F7F9; margin-top: 20px;">Adicionar novo dispositivo</h3>
+            <div class="form-group">
+                <!--<input class="form-control input-lg" placeholder="Add device" autofocus #deviceIp>
+                <br>
+                <button (click)="addDevice($event, deviceIp)" class="btn btn-primary btn-block">Create</button>-->
+                <div class="input-group">
+                    <input class="form-control input-lg" placeholder="IPv6" autofocus #deviceIp>
+                    <span class="input-group-btn">
+                        <button class="btn btn-primary btn-block input-lg" (click)="addDevice($event, deviceIp)" type="submit">Adicionar</button>
+                    </span>
+                </div>
             </div>
+            <h3 style="color: #F7F7F9; margin-top: 20px;">Dispositivos</h3>
+            
         </div>
-    </div>
-    <div class="device-list">
-        <div *ngFor="let device of devices">
-            <div class="col-md-1">
-                <input type="checkbox" [checked]="device.isCompleted" (click)="updateStatus(device)">
-            </div>
-            <div class="col-md-7">
-                <span [class.hidden]="device.isEditMode">{{device.ip}}</span>
-                <input type="text"  [class.hidden]="!device.isEditMode" [value]="device.ip" (keypress)="updateDeviceIp($event, device)">
-                <input type="button" [class.hidden]="!device.isEditMode" value="Cancelar" (click)="setEditState(device, false)" class="btn btn-warning">
+        <div class="device-list">
+            <div *ngFor="let device of devices">
+                <div class="col-md-1">
+                    <input type="checkbox" [checked]="device.isCompleted" (click)="updateStatus(device)">
+                </div>
+                <div class="col-md-7">
+                    <span [class.hidden]="device.isEditMode" style="color: #F7F7F9;">{{device.ip}}</span>
+                    <input type="text"  [class.hidden]="!device.isEditMode" [value]="device.ip" (keypress)="updateDeviceIp($event, device)">
+                    <input type="button" [class.hidden]="!device.isEditMode" value="Cancelar" (click)="setEditState(device, false)" class="btn btn-warning">
 
-            </div>
-            <div class="col-md-4 btns">
-                <input (click)="deleteDevice(device)" type="button" class="btn btn-danger pull-right" value="Apagar">
-                <input [class.disabled]="device.isCompleted" (click)="setEditState(device, true)" type="button" class="btn btn-default pull-right" value="Editar">
+                </div>
+                <div class="col-md-4 btns">
+                    <input (click)="deleteDevice(device)" type="button" class="btn btn-danger pull-right" value="Apagar">
+                    <input [class.disabled]="device.isCompleted" (click)="setEditState(device, true)" type="button" class="btn btn-default pull-right" value="Editar">
+                </div>
             </div>
         </div>
+        <!--<div class="device-list">
+            <div *ngFor="let device of devices">
+                <picture>
+                    <source srcset="mdn-logo-wide.png" media="(min-width: 20px)">
+                    <img src="../assets/device-icon.png" alt="MDN">
+                </picture>
+            </div>
+        </div>-->
+        
     </div>
-    <!--<div class="device-list">
-        <div *ngFor="let device of devices">
-            <picture>
-                <source srcset="mdn-logo-wide.png" media="(min-width: 20px)">
-                <img src="../assets/device-icon.png" alt="MDN">
-            </picture>
-        </div>
-    </div>-->
+    <div class="col-md-8" style="background: #1B1E27; height:1080px !important; margin-top: 50px; padding-left: 30px;">
+        <h3 style="color: #F7F7F9; margin-top: 20px;">Painel</h3>        
+        <app-barchart *ngIf="chartData" [data]="chartData"></app-barchart>
+    </div>
 </div>
 

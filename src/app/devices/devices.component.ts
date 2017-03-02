@@ -11,6 +11,7 @@ import { Device } from '../devices/devices.model';
 
 export class DevicesComponent implements OnInit { 
   devices: Device[];
+  private chartData: Array<any>;
   constructor(private _deviceService: DeviceService) {
 
   }
@@ -21,6 +22,24 @@ export class DevicesComponent implements OnInit {
       .subscribe(devices => {
         this.devices = devices;
       });
+
+    // give everything a chance to get loaded before starting the animation to reduce choppiness
+    setTimeout(() => {
+      this.generateData();
+
+      // change the data periodically
+      setInterval(() => this.generateData(), 3000);
+    }, 1000);
+  }
+
+  generateData() {
+    this.chartData = [];
+    for (let i = 0; i < (10 + Math.floor(Math.random() * 100)); i++) {
+      this.chartData.push([
+        `Param[${i}]`,
+        Math.floor(Math.random() * 100)
+      ]);
+    }
   }
 
   addDevice(event, deviceIp) {
