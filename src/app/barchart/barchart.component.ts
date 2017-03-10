@@ -7,6 +7,7 @@ import * as d3 from 'd3';
   styleUrls: ['./barchart.component.css'],
   encapsulation: ViewEncapsulation.None
 })
+
 export class BarchartComponent implements OnInit, OnChanges {
   @ViewChild('chart') private chartContainer: ElementRef;
   @Input() private data: Array<any>;

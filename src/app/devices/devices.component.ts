@@ -10,6 +10,7 @@ import { Device } from '../devices/devices.model';
 })
 
 export class DevicesComponent implements OnInit { 
+  private deviceIcon = require("./assets/device-icon.png");
   devices: Device[];
   private chartData: Array<any>;
   constructor(private _deviceService: DeviceService) {
