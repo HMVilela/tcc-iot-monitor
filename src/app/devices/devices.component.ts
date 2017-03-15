@@ -13,6 +13,7 @@ export class DevicesComponent implements OnInit {
   private deviceIcon = require("./assets/device-icon.png");
   devices: Device[];
   private chartData: Array<any>;
+  private chart1Data: Array<any>;
   constructor(private _deviceService: DeviceService) {
 
   }
@@ -27,21 +28,39 @@ export class DevicesComponent implements OnInit {
     // give everything a chance to get loaded before starting the animation to reduce choppiness
     setTimeout(() => {
       this.generateData();
+      //this.generateDataMock();
 
       // change the data periodically
-      setInterval(() => this.generateData(), 3000);
+      //setInterval(() => this.generateDataMock(), 3000);
     }, 1000);
   }
 
   generateData() {
     this.chartData = [];
-    for (let i = 0; i < (10 + Math.floor(Math.random() * 100)); i++) {
+    for (let i = 0; i < this.devices.length; i++) {
       this.chartData.push([
-        `Param[${i}]`,
-        Math.floor(Math.random() * 100)
+        this.devices[i].name, this.devices[i].extra
       ]);
     }
   }
+
+  generateDataMock(device) {
+    this.chart1Data = [];
+    for (let y = 0; y < device.interval.length; y++) {
+      this.chart1Data.push([
+        `Leitura[${y}]`, device.interval[y]
+      ]);
+    }
+  }
+
+  /*generateDataMock() {
+    this.chart1Data = [];
+    for (let i = 0; i < (10 + Math.floor(Math.random() * 100)); i++) {
+      this.chart1Data.push([
+        `#[${i}]`, Math.floor(Math.random() * 100)
+      ]);
+    }
+  }*/
 
   addDevice(event, deviceIp) {
     var result;
@@ -76,7 +95,8 @@ export class DevicesComponent implements OnInit {
     }
   }
 
-  updateStatus(device) {
+  updateStatus(device) {    
+    var dateNow = Date.now();
     var _device = {
       _id: device._id,
       ip: device.ip,
@@ -85,14 +105,14 @@ export class DevicesComponent implements OnInit {
       structure: device.structure,
       extra: device.extra,
       createdAt: device.createdAt,
-      updatedAt: device.updatedAt,
+      updatedAt: ''+dateNow,
       isCompleted: !device.isCompleted
 
     };
 
     this._deviceService.updateDevice(_device)
       .subscribe(data => {
-        device.isCompleted = !device.isCompleted;
+        device.updatedAt = ''+dateNow;
       });
   }
 

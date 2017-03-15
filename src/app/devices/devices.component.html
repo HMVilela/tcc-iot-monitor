@@ -36,7 +36,7 @@
                 </div>
                 <div class="col-md-3 btns text-center">
                     <i class="fa fa-eye " aria-hidden="true" style="color: #F7F7F9; margin: 5px; font-size: 20px; cursor: pointer; cursor: hand;"
-                    title="Ver detalhes no painel"> </i>
+                    (click)="generateDataMock(device)" title="Ver detalhes no painel"> </i>
                     <i class="fa fa-trash-o" aria-hidden="true" style="color: #F7F7F9; margin: 5px; font-size: 20px; cursor: pointer; cursor: hand;"
                     (click)="deleteDevice(device)" title="Remover dispositivo: {{device.name}}"> </i>
                     <!--<input [class.disabled]="device.isCompleted" (click)="setEditState(device, true)" type="button" class="btn btn-default pull-right" value="Editar">
@@ -55,8 +55,11 @@
         
     </div>
     <div class="col-md-8" style="background: #1B1E27; height:1080px !important; margin-top: 50px; padding-left: 30px;">
-        <h3 style="color: #F7F7F9; margin-top: 20px;">Painel</h3>        
+        <h3 style="color: #F7F7F9; margin-top: 20px;">Painel</h3>  
+        <h4 style="color: #F7F7F9; margin-top: 20px;">Geral</h4>      
         <app-barchart *ngIf="chartData" [data]="chartData"></app-barchart>
+        <h4 style="color: #F7F7F9; margin-top: 20px;">Intervalos</h4>
+        <app-barchart *ngIf="chart1Data" [data]="chart1Data"></app-barchart>
     </div>
 </div>
 

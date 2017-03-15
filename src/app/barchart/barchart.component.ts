@@ -47,7 +47,7 @@ export class BarchartComponent implements OnInit, OnChanges {
     // chart plot area
     this.chart = svg.append('g')
       .attr('class', 'bars')
-      .attr('transform', `translate(${this.margin.left}, ${this.margin.top})`);
+      .attr('transform', `translate(${this.margin.left}, ${this.margin.top})`);    
 
     // define X & Y domains
     let xDomain = this.data.map(d => d[0]);
