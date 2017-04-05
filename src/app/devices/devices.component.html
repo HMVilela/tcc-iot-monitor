@@ -6,12 +6,23 @@
                 <!--<input class="form-control input-lg" placeholder="Add device" autofocus #deviceIp>
                 <br>
                 <button (click)="addDevice($event, deviceIp)" class="btn btn-primary btn-block">Create</button>-->
-                <div class="input-group">
-                    <input class="form-control input-lg" placeholder="IPv6" autofocus #deviceIp>
-                    <span class="input-group-btn">
-                        <button class="btn btn-primary btn-block input-lg" (click)="addDevice($event, deviceIp)" type="submit">Adicionar</button>
-                    </span>
+                <p style="color: white; background: #b7b7b7; width: 100%; text-align: center; margin-bottom: -1px;">IPv6:</p>
+                <div class="input-group" style="background: white;"> 
+                    <ng2-ip [(ngModel)]="ip"
+                        [inputValidation]="inputValidation"
+                        [disabledBlocks]="disabledBlocks"
+                        [highlightInvalidBlocks]="highlightInvalidBlocks"
+                        [theme]="'ng2-ip-theme-' + theme"
+                        [mode]="mode"
+                        [copyMode]="copyMode">
+                    </ng2-ip>
                 </div>
+                <button class="btn btn-primary btn-block input-lg" (click)="showDialog()" [class.disabled]="!loading" type="submit" style="margin-top: 10px;">
+                    <span [class.hidden]="!loading">Buscar</span>
+                    <i class="fa fa-spinner fa-pulse fa-2x fa-fw" [class.hidden]="loading" style="color: white; vertical-align: middle;"></i>
+                    <span [class.hidden]="loading" style="vertical-align: middle;">Verificando...</span>
+                </button>
+                <p-messages [value]="msgs"></p-messages>                
             </div>
             <h3 style="color: #F7F7F9; margin-top: 20px; margin-bottom: 20px;">Dispositivos</h3>
             
@@ -24,8 +35,8 @@
                     title="Detalhes:
                     Nome: {{device.name}}
                     IPv6: {{device.ip}}
-                    Structure: {{device.structure}}
-                    Interval: {{device.interval}}"/>
+                    Intervalo: {{device.interval}}
+                    Criado em: {{device.creation}}"/>
                 </div>
                 <div class="col-md-8">
                     <span [class.hidden]="device.isEditMode" style="color: #F7F7F9; margin-left: 10px;"><strong>{{device.name}}</strong><br></span>
@@ -43,23 +54,32 @@
                     <input (click)="deleteDevice(device)" type="button" class="btn btn-danger pull-right" value="Apagar">-->
                 </div>
             </div>
-        </div>
-        <!--<div class="device-list">
-            <div *ngFor="let device of devices">
-                <picture>
-                    <source srcset="mdn-logo-wide.png" media="(min-width: 20px)">
-                    <img src="../assets/device-icon.png" alt="MDN">
-                </picture>
-            </div>
-        </div>-->
-        
+        </div>        
     </div>
+
     <div class="col-md-8" style="background: #1B1E27; height:1080px !important; margin-top: 50px; padding-left: 30px;">
         <h3 style="color: #F7F7F9; margin-top: 20px;">Painel</h3>  
-        <h4 style="color: #F7F7F9; margin-top: 20px;">Geral</h4>      
-        <app-barchart *ngIf="chartData" [data]="chartData"></app-barchart>
-        <h4 style="color: #F7F7F9; margin-top: 20px;">Intervalos</h4>
-        <app-barchart *ngIf="chart1Data" [data]="chart1Data"></app-barchart>
+        <h4 style="color: #F7F7F9; margin-top: 20px;">Gráfico</h4>      
+        <app-charts></app-charts>        
+        <h4 style="color: #F7F7F9; margin-top: 20px;">Atributos</h4>        
     </div>
+
+    <p-dialog [(visible)]="display">        
+        <p-header>
+            <img [src]="deviceIcon" style="max-width: 30px; margin-right: 5px;" /><span>&nbsp;&nbsp;Adicionar novo dispositivo:</span>
+        </p-header>
+        <span>IPv6:&nbsp;&nbsp;</span><span style="float: right;">{{ip}}</span><br>
+        <span>Nome:&nbsp;&nbsp;</span><input type="text" pInputText [(ngModel)]="prop_name" style="width: 301px;"/><br>
+        <div style="margin-top: 5px; float: left;"><span>Intervalo (segundos):&nbsp;&nbsp;</span><p-spinner size="23" [(ngModel)]="prop_interval"></p-spinner></div><br>
+        <div class="dialog-content"><hr>
+            <span>Temperatura  </span><p-checkbox name="add-device-form" value="temperatura" [(ngModel)]="selectedValues" style="float: right;"></p-checkbox><br>
+            <span>Pressão  </span><p-checkbox name="add-device-form" value="pressao" [(ngModel)]="selectedValues" style="float: right;"></p-checkbox><br>
+            <span>Luminosidade  </span><p-checkbox name="add-device-form" value="luminosidade" [(ngModel)]="selectedValues" style="float: right;"></p-checkbox><br>
+            <span>Switch  </span><p-checkbox name="add-device-form" value="switch" [(ngModel)]="selectedValues" style="float: right;"></p-checkbox><br>
+        </div><hr>
+        <p-footer>
+            <button pButton type="button" (click)="addDevice($event, device)" label="Adicionar" style="float: right; margin-right: 15px; margin-bottom: 15px;"></button>
+        </p-footer>
+    </p-dialog>
 </div>
 

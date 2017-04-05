@@ -1,6 +1,17 @@
-import { Component, OnInit } from '@angular/core';
-import { DeviceService } from '../devices.service';
-import { Device } from '../devices/devices.model';
+import { Component, OnInit, ViewContainerRef, ViewEncapsulation } from '@angular/core';
+import { DeviceService } from '../services/devices.service';
+import { Device } from '../models/device.model';
+
+import { IP_VALIDATION_TYPE, COPY_MODE_TYPE } from 'ng2-ip';
+
+import { DialogModule } from 'primeng/primeng';
+import {CheckboxModule} from 'primeng/primeng';
+import {InputTextModule} from 'primeng/primeng';
+import {ButtonModule} from 'primeng/primeng';
+import {SpinnerModule} from 'primeng/primeng';
+import {MessagesModule} from 'primeng/primeng';
+
+
 
 @Component({
   moduleId: module.id,
@@ -14,9 +25,27 @@ export class DevicesComponent implements OnInit {
   devices: Device[];
   private chartData: Array<any>;
   private chart1Data: Array<any>;
-  constructor(private _deviceService: DeviceService) {
 
-  }
+  inputValidation: IP_VALIDATION_TYPE = 'block';
+  disabledBlocks: boolean[] = [];
+  highlightInvalidBlocks = true;
+  theme: string = 'default';
+  mode: string = 'ipv6';
+
+  copyMode: COPY_MODE_TYPE = 'select';
+
+  ip: string;
+  prop_name: string;
+  prop_interval: string;
+
+  selectedValues: string[] = [];
+
+  display: boolean = false;
+  loading: boolean = true;
+  msgs: MessagesModule[] = [];
+
+    
+  constructor(private _deviceService: DeviceService) { }
 
   ngOnInit() {
     this.devices = [];
@@ -24,67 +53,26 @@ export class DevicesComponent implements OnInit {
       .subscribe(devices => {
         this.devices = devices;
       });
-
-    // give everything a chance to get loaded before starting the animation to reduce choppiness
-    setTimeout(() => {
-      this.generateData();
-      //this.generateDataMock();
-
-      // change the data periodically
-      //setInterval(() => this.generateDataMock(), 3000);
-    }, 1000);
   }
 
-  generateData() {
-    this.chartData = [];
-    for (let i = 0; i < this.devices.length; i++) {
-      this.chartData.push([
-        this.devices[i].name, this.devices[i].extra
-      ]);
-    }
-  }
-
-  generateDataMock(device) {
-    this.chart1Data = [];
-    for (let y = 0; y < device.interval.length; y++) {
-      this.chart1Data.push([
-        `Leitura[${y}]`, device.interval[y]
-      ]);
-    }
-  }
-
-  /*generateDataMock() {
-    this.chart1Data = [];
-    for (let i = 0; i < (10 + Math.floor(Math.random() * 100)); i++) {
-      this.chart1Data.push([
-        `#[${i}]`, Math.floor(Math.random() * 100)
-      ]);
-    }
-  }*/
-
-  addDevice(event, deviceIp) {
+  addDevice(event, device) {
     var result;
     var dateNow = Date.now();
     var newDevice = {
       _id: 0,      
-      ip: deviceIp.value,
-      name: 'device###',
-      interval: 'interval data',
-      structure: 'structure data',
-      extra: 'extra data',      
-      createdAt: ''+dateNow,
-      updatedAt: "criado",
-      isCompleted: false
+      ip: this.ip,
+      name: this.prop_name,
+      interval: this.prop_interval,
+      creation: ''+dateNow,
+      modification: "novo"
     };
-
-    
 
     result = this._deviceService.saveDevice(newDevice);
     result.subscribe(x => {
-      newDevice._id = deviceIp._id;
-      this.devices.push(newDevice);
-      deviceIp.value = '';
+      newDevice._id = device._id;
+      this.devices.push(newDevice);      
     });
+    window.location.reload();
   }
 
   setEditState(device, state) {
@@ -102,17 +90,13 @@ export class DevicesComponent implements OnInit {
       ip: device.ip,
       name: device.name,
       interval: device.interval,
-      structure: device.structure,
-      extra: device.extra,
-      createdAt: device.createdAt,
-      updatedAt: ''+dateNow,
-      isCompleted: !device.isCompleted
-
+      creation: device.creation,
+      modification: ''+dateNow
     };
 
     this._deviceService.updateDevice(_device)
       .subscribe(data => {
-        device.updatedAt = ''+dateNow;
+        device.modification = ''+dateNow;
       });
   }
 
@@ -124,12 +108,8 @@ export class DevicesComponent implements OnInit {
         ip: device.ip,
         name: device.name,
         interval: device.interval,
-        structure: device.structure,
-        extra: device.extra,
-        createdAt: device.createdAt,
-        updatedAt: device.updatedAt,
-        isCompleted: device.isCompleted
-
+        creation: device.creation,
+        modification: device.modification
       };
 
       this._deviceService.updateDevice(_device)
@@ -153,4 +133,45 @@ export class DevicesComponent implements OnInit {
         }
       })
   }
+
+  showDialog() {
+        this.loading = false;
+        this.display = true;
+        this.showWarn();
+    }
+
+  show() {
+    this.msgs.push({severity:'info', summary:'Info Message', detail:'PrimeNG rocks'});
+  }
+
+  hide() {
+    this.msgs = [];
+  }  
+
+  showInfo() {
+        this.msgs = [];
+        this.msgs.push({severity:'info', summary:'Info Message', detail:'PrimeNG rocks'});
+  }
+
+  showWarn() {
+      this.msgs = [];
+      this.msgs.push({severity:'warn', summary:'Atenção', detail:'O dispositivo já existe.'});
+  }
+
+  showError() {
+      this.msgs = [];
+      this.msgs.push({severity:'error', summary:'Erro', detail:'Validation failed'});
+  }
+
+  showMultiple() {
+      this.msgs = [];
+      this.msgs.push({severity:'info', summary:'Message 1', detail:'PrimeNG rocks'});
+      this.msgs.push({severity:'info', summary:'Message 2', detail:'PrimeUI rocks'});
+      this.msgs.push({severity:'info', summary:'Message 3', detail:'PrimeFaces rocks'});
+  }
+
+  clear() {
+      this.msgs = [];
+  }
+ 
 }

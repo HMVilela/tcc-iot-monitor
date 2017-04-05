@@ -4,7 +4,10 @@ const http = require('http');
 const bodyParser = require('body-parser');
 
 // Get our API routes
-const api = require('./server/routes/api');
+//const api = require('./server/routes/api');
+const devices = require('./server/routes/devices');
+const attributes = require('./server/routes/attributes');
+const data = require('./server/routes/data');
 
 const app = express();
 
@@ -16,7 +19,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'dist')));
 
 // Set our api routes
-app.use('/api/v1', api);
+app.use('/api/v1', devices);
+app.use('/api/v1', attributes);
+app.use('/api/v1', data);
+//app.use('/api/v1', api);
 
 // Catch all other routes and return the index file
 app.get('*', (req, res) => {
@@ -37,4 +43,4 @@ const server = http.createServer(app);
 /**
  * Listen on provided port, on all network interfaces.
  */
-server.listen(port, () => console.log(`API running on localhost:${port}`));
+server.listen(port, () => console.log(`API rodando em localhost:${port}`));
