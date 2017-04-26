@@ -1,8 +1,13 @@
 export class Device {
-    _id: any;
     ip: string;
     name: string;
     interval: string;
+    attributes: {
+        temperature: boolean,
+        pressure: boolean,
+        luminosity: boolean,
+        switch: boolean
+    };
     creation: string;
     modification: string;
 }

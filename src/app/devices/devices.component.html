@@ -3,10 +3,7 @@
         <div class="add-device-form">
             <h3 style="color: #F7F7F9; margin-top: 20px;">Adicionar novo dispositivo</h3>
             <div class="form-group">
-                <!--<input class="form-control input-lg" placeholder="Add device" autofocus #deviceIp>
-                <br>
-                <button (click)="addDevice($event, deviceIp)" class="btn btn-primary btn-block">Create</button>-->
-                <p style="color: white; background: #b7b7b7; width: 100%; text-align: center; margin-bottom: -1px;">IPv6:</p>
+                <p style="color: white; background: #26a69a; width: 100%; text-align: center; margin-bottom: -1px; border-top-left-radius: 20px; border-top-right-radius: 20px;">IPv6:</p>
                 <div class="input-group" style="background: white;"> 
                     <ng2-ip [(ngModel)]="ip"
                         [inputValidation]="inputValidation"
@@ -15,12 +12,12 @@
                         [theme]="'ng2-ip-theme-' + theme"
                         [mode]="mode"
                         [copyMode]="copyMode">
-                    </ng2-ip>
+                    </ng2-ip>                    
                 </div>
-                <button class="btn btn-primary btn-block input-lg" (click)="showDialog()" [class.disabled]="!loading" type="submit" style="margin-top: 10px;">
-                    <span [class.hidden]="!loading">Buscar</span>
-                    <i class="fa fa-spinner fa-pulse fa-2x fa-fw" [class.hidden]="loading" style="color: white; vertical-align: middle;"></i>
-                    <span [class.hidden]="loading" style="vertical-align: middle;">Verificando...</span>
+                <button class="btn btn-primary btn-block input-lg" (click)="createNewDevice()" [class.disabled]="loading" type="submit">
+                    <span [class.hidden]="loading">Buscar</span>
+                    <i class="fa fa-spinner fa-pulse fa-2x fa-fw" [class.hidden]="!loading" style="color: white; vertical-align: middle;"></i>
+                    <span [class.hidden]="!loading" style="vertical-align: middle;">Verificando...</span>
                 </button>
                 <p-messages [value]="msgs"></p-messages>                
             </div>
@@ -30,13 +27,14 @@
         <div class="device-list">
             <div *ngFor="let device of devices" class="row" style="background: dimgray; margin: 5px;">
                 <div class="col-md-1">
-                    <!--<input type="checkbox" [checked]="device.isCompleted" (click)="updateStatus(device)">-->
                     <img [src]="deviceIcon" style="max-width: 30px; margin-top: 5px;" 
                     title="Detalhes:
+                    Id: {{device._id}}
                     Nome: {{device.name}}
                     IPv6: {{device.ip}}
                     Intervalo: {{device.interval}}
-                    Criado em: {{device.creation}}"/>
+                    Criado em: {{device.creation}}
+                    Modificado em: {{device.modification}}"/>
                 </div>
                 <div class="col-md-8">
                     <span [class.hidden]="device.isEditMode" style="color: #F7F7F9; margin-left: 10px;"><strong>{{device.name}}</strong><br></span>
@@ -45,9 +43,11 @@
                     <input type="button" [class.hidden]="!device.isEditMode" value="Cancelar" (click)="setEditState(device, false)" class="btn btn-warning">
 
                 </div>
-                <div class="col-md-3 btns text-center">
-                    <i class="fa fa-eye " aria-hidden="true" style="color: #F7F7F9; margin: 5px; font-size: 20px; cursor: pointer; cursor: hand;"
-                    (click)="generateDataMock(device)" title="Ver detalhes no painel"> </i>
+                <div class="col-md-3 btns text-center" style="margin-top: 5px;">                    
+                    <i class="fa fa-bar-chart " aria-hidden="true" style="color: #F7F7F9; margin: 5px; font-size: 20px; cursor: pointer; cursor: hand;"
+                    (click)="viewDeviceInfo(device)" title="Ver detalhes no painel"> </i>
+                    <i class="fa fa-edit " aria-hidden="true" style="color: #F7F7F9; margin: 5px; font-size: 20px; cursor: pointer; cursor: hand;"
+                    (click)="showEditDeviceDialog(device)" title="Editar"> </i>
                     <i class="fa fa-trash-o" aria-hidden="true" style="color: #F7F7F9; margin: 5px; font-size: 20px; cursor: pointer; cursor: hand;"
                     (click)="deleteDevice(device)" title="Remover dispositivo: {{device.name}}"> </i>
                     <!--<input [class.disabled]="device.isCompleted" (click)="setEditState(device, true)" type="button" class="btn btn-default pull-right" value="Editar">
@@ -58,19 +58,65 @@
     </div>
 
     <div class="col-md-8" style="background: #1B1E27; height:1080px !important; margin-top: 50px; padding-left: 30px;">
-        <h3 style="color: #F7F7F9; margin-top: 20px;">Painel</h3>  
-        <h4 style="color: #F7F7F9; margin-top: 20px;">Gráfico</h4>      
-        <app-charts></app-charts>        
-        <h4 style="color: #F7F7F9; margin-top: 20px;">Atributos</h4>        
+        <h3 style="color: #F7F7F9; margin-top: 20px; margin-bottom: 20px;">
+            <span style="float: left; margin-right: 10px; padding-left: 30px; padding-right: 30px; background:#a1a1a1; border-radius: 25px;"></span>
+            Painel
+        </h3>
+        
+        <div style="width: 100%; height: 4px; background: #2F3646;"></div>
+        <h4 style="color: #F7F7F9; margin-top: 30px; margin-bottom: 30px;">Monitor</h4>  
+        <div class="col-md-3" style="height: 100px;" [class.hidden]="attributeTemperatura">
+            <div style="background: red; border-radius: 25px; border: 3px solid #a1a1a1; margin: 5px; height: 100px; ">
+                <div style="display: flex; justify-content: center; align-items:center; padding-top: 20px; padding-bottom: 20px;">
+                    <i class="fa fa-thermometer-three-quarters " aria-hidden="true" style="color: #F7F7F9; font-size: 50px; height:100%;"
+                        (click)="viewDeviceInfo(device)" title="Ver detalhes no painel"> </i>
+                    <span style="color: #F7F7F9; font-size: 40px; font-weight: bold;" *ngIf="temperValue">&nbsp;&nbsp;{{temperValue}}</span>                    
+                    <span style="color: #F7F7F9; font-size: 20px; font-weight: bold;">&nbsp;ºC</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3" style="height: 100px;" [class.hidden]="attributePressao">
+            <div style="background: green; border-radius: 25px; border: 3px solid #a1a1a1; margin: 5px; height: 100px; ">
+                <div style="display: flex; justify-content: center; align-items:center; padding-top: 20px; padding-bottom: 20px;">
+                    <i class="fa fa-tachometer " aria-hidden="true" style="color: #F7F7F9; font-size: 50px; height:100%;"
+                        (click)="viewDeviceInfo(device)" title="Ver detalhes no painel"> </i>
+                    <span style="color: #F7F7F9; font-size: 40px; font-weight: bold;">&nbsp;&nbsp;40</span>
+                    <span style="color: #F7F7F9; font-size: 20px; font-weight: bold;">&nbsp;PSI</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3" style="height: 100px;" [class.hidden]="attributeLuminosidade">
+            <div style="background: blue; border-radius: 25px; border: 3px solid #a1a1a1; margin: 5px; height: 100px; ">
+                <div style="display: flex; justify-content: center; align-items:center; padding-top: 20px; padding-bottom: 20px;">
+                    <i class="fa fa-lightbulb-o" aria-hidden="true" style="color: #F7F7F9; font-size: 50px; height:100%;"
+                        (click)="viewDeviceInfo(device)" title="Ver detalhes no painel"> </i>
+                    <span style="color: #F7F7F9; font-size: 40px; font-weight: bold;">&nbsp;&nbsp;20</span>
+                    <span style="color: #F7F7F9; font-size: 20px; font-weight: bold;">&nbsp;LUM</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3" style="height: 100px;" [class.hidden]="attributeSwitch">
+            <div style="background: orange; border-radius: 25px; border: 3px solid #a1a1a1; margin: 5px; height: 100px; ">
+                <div style="display: flex; justify-content: center; align-items:center; padding-top: 20px; padding-bottom: 20px;">
+                    <i class="fa fa-cogs" aria-hidden="true" style="color: #F7F7F9; font-size: 50px; height:100%;"
+                        (click)="viewDeviceInfo(device)" title="Ver detalhes no painel"> </i>
+                    <span style="color: #F7F7F9; font-size: 40px; font-weight: bold;">&nbsp;&nbsp;5&nbsp;</span>
+                    <span style="color: #F7F7F9; font-size: 20px; font-weight: bold;">&nbsp;[u]</span>
+                </div>
+            </div>
+        </div>
+        
+        <h4 style="color: #F7F7F9; margin-top: 180px; margin-bottom: 40px;">Dados</h4>      
+        <app-charts></app-charts>            
     </div>
 
-    <p-dialog [(visible)]="display">        
+    <p-dialog [(visible)]="newDeviceDialog">        
         <p-header>
             <img [src]="deviceIcon" style="max-width: 30px; margin-right: 5px;" /><span>&nbsp;&nbsp;Adicionar novo dispositivo:</span>
         </p-header>
         <span>IPv6:&nbsp;&nbsp;</span><span style="float: right;">{{ip}}</span><br>
-        <span>Nome:&nbsp;&nbsp;</span><input type="text" pInputText [(ngModel)]="prop_name" style="width: 301px;"/><br>
-        <div style="margin-top: 5px; float: left;"><span>Intervalo (segundos):&nbsp;&nbsp;</span><p-spinner size="23" [(ngModel)]="prop_interval"></p-spinner></div><br>
+        <span>Nome:&nbsp;&nbsp;</span><input type="text" pInputText [(ngModel)]="deviceName" style="width: 301px;"/><br>
+        <div style="margin-top: 5px; float: left;"><span>Intervalo (segundos):&nbsp;&nbsp;</span><p-spinner size="23" [(ngModel)]="deviceInterval"></p-spinner></div><br>
         <div class="dialog-content"><hr>
             <span>Temperatura  </span><p-checkbox name="add-device-form" value="temperatura" [(ngModel)]="selectedValues" style="float: right;"></p-checkbox><br>
             <span>Pressão  </span><p-checkbox name="add-device-form" value="pressao" [(ngModel)]="selectedValues" style="float: right;"></p-checkbox><br>
@@ -78,8 +124,27 @@
             <span>Switch  </span><p-checkbox name="add-device-form" value="switch" [(ngModel)]="selectedValues" style="float: right;"></p-checkbox><br>
         </div><hr>
         <p-footer>
-            <button pButton type="button" (click)="addDevice($event, device)" label="Adicionar" style="float: right; margin-right: 15px; margin-bottom: 15px;"></button>
+            <button pButton type="button" (click)="addDevice(device, ip)" label="Adicionar" style="float: right; margin-right: 15px; margin-bottom: 15px;"></button>
         </p-footer>
     </p-dialog>
+
+    <p-dialog [(visible)]="editDeviceDialog">        
+        <p-header>
+            <img [src]="deviceIcon" style="max-width: 30px; margin-right: 5px;" /><span>&nbsp;&nbsp;Editar dispositivo:</span>
+        </p-header>
+        <span>IPv6:&nbsp;&nbsp;</span><span style="float: right;">{{deviceIp}}</span><br>
+        <span>Nome:&nbsp;&nbsp;</span><input type="text" pInputText [(ngModel)]="deviceName" style="width: 301px;"/><br>
+        <div style="margin-top: 5px; float: left;"><span>Intervalo (segundos):&nbsp;&nbsp;</span><p-spinner size="23" [(ngModel)]="deviceInterval"></p-spinner></div><br>
+        <div class="dialog-content"><hr>
+            <span>Temperatura  </span><p-checkbox name="add-device-form" value="temperatura" [(ngModel)]="selectedValues" style="float: right;"></p-checkbox><br>
+            <span>Pressão  </span><p-checkbox name="add-device-form" value="pressao" [(ngModel)]="selectedValues" style="float: right;"></p-checkbox><br>
+            <span>Luminosidade  </span><p-checkbox name="add-device-form" value="luminosidade" [(ngModel)]="selectedValues" style="float: right;"></p-checkbox><br>
+            <span>Switch  </span><p-checkbox name="add-device-form" value="switch" [(ngModel)]="selectedValues" style="float: right;"></p-checkbox><br>            
+        </div><hr>
+        <p-footer>            
+            <button pButton type="button" (click)="preparetoUpdate()" label="Salvar alterações" style="float: right; margin-right: 15px; margin-bottom: 15px;"></button>
+        </p-footer>
+    </p-dialog>
+    
 </div>
 

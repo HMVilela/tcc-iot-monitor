@@ -1,7 +1,15 @@
 var express = require('express');
 var router = express.Router();
 var mongojs = require('mongojs');
-var db = mongojs('mongodb://marrom:marrom@ds153729.mlab.com:53729/tcc-iot-rest', ['devices']);
+var db = mongojs('mongodb://@localhost/tcc-iot-rest', ['devices', 'attributes']);
+//var db = mongojs('mongodb://marrom:marrom@ds153729.mlab.com:53729/tcc-iot-rest', ['devices']);
+
+var attribute = {
+    "name": "",
+    "deviceId": "",
+    "path": "",
+    "creation": ""
+};
 
 //Get Devices
 router.get('/devices', function(req, res, next) {
@@ -30,7 +38,7 @@ router.get('/device/:id', function(req, res, next) {
 //Save device
 router.post('/device', function(req, res, next) {
     var device = req.body;
-    if(!device.ip || !(device.isCompleted + '')) {
+    if(!device.ip) {
         res.status(400);
         res.json({
             "error": "Invalid Data"
@@ -40,6 +48,18 @@ router.post('/device', function(req, res, next) {
             if(err) {
                 res.send(err);
             } else {
+                if(device.attributes.temperature) {                    
+                    db.attributes.insert(createAttribute("Temperatura", result));
+                }
+                if(device.attributes.pressure) {                    
+                    db.attributes.insert(createAttribute("Pressão", result));
+                }
+                if(device.attributes.luminosity) {                    
+                    db.attributes.insert(createAttribute("Luminosidade", result));
+                }
+                if(device.attributes.switch) {                    
+                    db.attributes.insert(createAttribute("Switch", result));
+                }                
                 res.json(result);
             }
         });
@@ -48,15 +68,15 @@ router.post('/device', function(req, res, next) {
 
 //Update device
 router.put('/device/:id', function(req, res, next) {
-    var device = req.body;
-    var updObj = {};
+    var device = req.body;    
+    var updObj = { 
+        ip: device.ip,
+        name: device.name,
+        interval: device.interval,
+        creation: device.creation,
+        modification: device.modification
+    };
 
-    if(device.isCompleted ) {
-        updObj.isCompleted = device.isCompleted;
-    }
-    if(device.ip) {
-        updObj.ip = device.ip;
-    }
     if(!updObj) {
         res.status(400);
         res.json({
@@ -87,5 +107,30 @@ router.delete('/device/:id', function(req, res, next) {
         }
     });    
 });
+
+//Get attributes by deviceID
+router.get('/device/attribute/:id', function(req, res, next) {
+    db.attributes.findOne({
+        _id: mongojs.ObjectId(req.params.id)
+    }, function(err, device) {
+        if(err) {
+            res.send(err);
+        } else {
+            res.json(device);
+        }
+    });
+});
+
+createAttribute = function(attributeType, newDevice) {
+    var dateNow = Date.now();
+    attribute = {
+        "name": attributeType,
+        "deviceId": mongojs.ObjectId(newDevice._id),
+        "path": "coap://"+newDevice.ip+"/"+newDevice._id+"/"+attributeType,
+        "creation": dateNow
+    };
+
+    return attribute;
+}
 
 module.exports = router;

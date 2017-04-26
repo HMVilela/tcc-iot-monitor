@@ -19,7 +19,7 @@ export class DeviceService {
         return this._http.post('/api/v1/device', JSON.stringify(device), {headers: headers})
             .map(res => res.json());
     }
-
+    
     updateDevice(device) {
         var headers = new Headers();
         headers.append('Content-Type', 'application/json');

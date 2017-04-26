@@ -169,10 +169,10 @@ export class ChartsComponent implements OnInit {
 						selected: 1
 					},
 					title: {
-						text: 'AAPL Stock Price'
+						text: 'Dados do dispositivo'
 					},
 					series: [{
-						name: 'AAPL',
+						name: 'Atributo',
 						data: aaplc.json(),
 						tooltip: {
 							valueDecimals: 2
