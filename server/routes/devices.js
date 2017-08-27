@@ -3,6 +3,28 @@ var router = express.Router();
 var mongojs = require('mongojs');
 var db = mongojs('mongodb://@localhost/tcc-iot-rest', ['devices', 'attributes']);
 //var db = mongojs('mongodb://marrom:marrom@ds153729.mlab.com:53729/tcc-iot-rest', ['devices']);
+var coap = require('coap');
+
+var IP = 'californium.eclipse.org';
+
+resources = {
+	'link1': 'Temp',
+	'link2': "Press",
+	'validate': "Humi"
+};
+
+
+setInterval(function(t) {
+	for (var k in resources) {
+		var req = coap.request('coap://[' + IP + ']:5683/' + k);
+		(function(kk) {
+			req.on('response', function(res) {
+				console.log(kk + ": " + res.payload.toString());
+			});
+		})(resources[k]);
+		req.end();
+	}
+}, 2000);
 
 var attribute = {
     "name": "",
